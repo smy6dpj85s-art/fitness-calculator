@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Υπολογιστής Θερμίδων & Macros</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f4f4;
+    margin:0;
+    padding:20px;
+}
+
+.container{
+    max-width:700px;
+    margin:auto;
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 0 15px rgba(0,0,0,0.1);
+}
+
+h1{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+label{
+    display:block;
+    margin-top:15px;
+    font-weight:bold;
+}
+
+input,select{
+    width:100%;
+    padding:12px;
+    margin-top:5px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    box-sizing:border-box;
+}
+
+button{
+    width:100%;
+    margin-top:25px;
+    padding:15px;
+    border:none;
+    border-radius:10px;
+    font-size:18px;
+    cursor:pointer;
+}
+
+.result{
+    margin-top:25px;
+    padding:20px;
+    background:#f8f8f8;
+    border-radius:10px;
+    display:none;
+}
+
+.result h2{
+    margin-top:0;
+}
+
+.macro{
+    margin:10px 0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Υπολογιστής Θερμίδων & Macros</h1>
+
+<label>Φύλο</label>
+<select id="gender">
+<option value="male">Άνδρας</option>
+<option value="female">Γυναίκα</option>
+</select>
+
+<label>Ηλικία</label>
+<input type="number" id="age" min="15" max="100">
+
+<label>Ύψος (cm)</label>
+<input type="number" id="height">
+
+<label>Βάρος (kg)</label>
+<input type="number" id="weight">
+
+<label>Ποσοστό Λίπους (%) - Προαιρετικό</label>
+<input type="number" id="bodyfat" min="1" max="60">
+
+<label>Βήματα ανά ημέρα</label>
+<input type="number" id="steps">
+
+<label>Προπονήσεις ανά εβδομάδα</label>
+<input type="number" id="workouts">
+
+<label>Στόχος</label>
+<select id="goal">
+<option value="cut">Απώλεια Λίπους</option>
+<option value="maintain">Συντήρηση</option>
+<option value="gain">Μυϊκή Ανάπτυξη</option>
+</select>
+
+<button onclick="calculate()">Υπολογισμός</button>
+
+<div class="result" id="result">
+
+<h2>Αποτελέσματα</h2>
+
+<p><strong>Θερμίδες:</strong> <span id="calories"></span></p>
+
+<div class="macro">
+<strong>Πρωτεΐνη:</strong> <span id="protein"></span> g
+</div>
+
+<div class="macro">
+<strong>Λιπαρά:</strong> <span id="fat"></span> g
+</div>
+
+<div class="macro">
+<strong>Υδατάνθρακες:</strong> <span id="carbs"></span> g
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function calculate(){
+
+const gender=document.getElementById("gender").value;
+const age=parseFloat(document.getElementById("age").value);
+const height=parseFloat(document.getElementById("height").value);
+const weight=parseFloat(document.getElementById("weight").value);
+const bodyfat=parseFloat(document.getElementById("bodyfat").value);
+const steps=parseFloat(document.getElementById("steps").value);
+const workouts=parseFloat(document.getElementById("workouts").value);
+const goal=document.getElementById("goal").value;
+
+if(!age || !height || !weight || !steps || workouts===undefined){
+alert("Συμπλήρωσε όλα τα υποχρεωτικά πεδία.");
+return;
+}
+
+let bmr;
+
+if(bodyfat && bodyfat > 0){
+
+const lbm = weight * (1 - bodyfat/100);
+bmr = 370 + (21.6 * lbm);
+
+}else{
+
+if(gender==="male"){
+bmr = (10*weight)+(6.25*height)-(5*age)+5;
+}else{
+bmr = (10*weight)+(6.25*height)-(5*age)-161;
+}
+
+}
+
+let activity = 1.2;
+
+if(steps >= 5000 && steps < 8000){
+activity = 1.35;
+}
+
+if(steps >= 8000 && steps < 12000){
+activity = 1.5;
+}
+
+if(steps >= 12000){
+activity = 1.65;
+}
+
+if(workouts >= 4){
+activity += 0.05;
+}
+
+let tdee = bmr * activity;
+
+let calories;
+
+if(goal==="cut"){
+calories = tdee * 0.85;
+}
+
+if(goal==="maintain"){
+calories = tdee;
+}
+
+if(goal==="gain"){
+calories = tdee * 1.10;
+}
+
+let protein;
+
+if(goal==="cut"){
+protein = weight * 2.0;
+}else{
+protein = weight * 1.8;
+}
+
+let fat = weight * 0.6;
+
+let carbs = (calories - (protein*4) - (fat*9)) / 4;
+
+calories = Math.round(calories);
+protein = Math.round(protein);
+fat = Math.round(fat);
+carbs = Math.round(carbs);
+
+document.getElementById("calories").innerText = calories + " kcal";
+document.getElementById("protein").innerText = protein;
+document.getElementById("fat").innerText = fat;
+document.getElementById("carbs").innerText = carbs;
+
+document.getElementById("result").style.display="block";
+
+}
+
+</script>
+
+</body>
+</html>
